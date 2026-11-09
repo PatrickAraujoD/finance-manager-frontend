@@ -15,12 +15,10 @@ npm ci
 npm run dev                    # http://localhost:3001
 ```
 
-A API precisa estar no ar (`API_URL`, padrão `http://localhost:3000`) e liberar a origem do
-frontend no CORS. No `.env` do backend:
-
-```
-CORS_ORIGINS=http://localhost:3001
-```
+A API precisa estar no ar em `API_URL` (padrão `http://localhost:3000`, não a porta do
+frontend). O navegador chama `/backend/*` e o Next repassa para a API, então o backend não
+precisa de CORS. Atrás desse repasse a API enxerga o IP do servidor do Next; em produção,
+configure `TRUST_PROXY=1` no backend para o rate limit usar o IP real do usuário.
 
 Para criar o primeiro admin, use o seed do backend (`npm run seed`).
 
