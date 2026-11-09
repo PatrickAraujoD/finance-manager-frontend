@@ -104,7 +104,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid items-start gap-5 lg:grid-cols-[1fr_20rem]">
+    <form onSubmit={onSubmit} className="grid gap-5 lg:grid-cols-[1fr_20rem]">
       <div className="card bg-base-100 shadow-sm">
       <div className="card-body gap-4">
         {error && <div role="alert" className="alert alert-error alert-soft text-sm">{error}</div>}
@@ -178,7 +178,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
       </div>
       </div>
 
-      <aside className="card bg-base-100 shadow-sm lg:sticky lg:top-24" aria-label="Resumo do gasto">
+      <aside className="card bg-base-100 shadow-sm" aria-label="Resumo do gasto">
         <div className="card-body gap-4">
           <h2 className="card-title text-base">Resumo</h2>
           <div className="rounded-box bg-linear-to-br from-primary to-secondary p-4 text-primary-content">
