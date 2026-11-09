@@ -14,6 +14,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { initials } from "@/lib/format";
 import { ThemeToggle } from "./theme-toggle";
 
 interface NavItem {
@@ -33,14 +34,6 @@ const ITEMS: NavItem[] = [
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
-}
-
-function initials(name?: string | null) {
-  return (name ?? "?")
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
 }
 
 export function AppNav() {

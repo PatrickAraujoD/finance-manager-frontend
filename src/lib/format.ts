@@ -55,3 +55,23 @@ export const formatDayShort = (date: string) => {
 };
 
 export const todayIso = () => new Date().toISOString().slice(0, 10);
+
+export function initials(name?: string | null): string {
+  return (name ?? "?")
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
+/** "Hoje", "Ontem" ou "segunda-feira, 10 de novembro". */
+export function dayLabel(date: string): string {
+  const today = new Date();
+  const yesterday = new Date(today.getTime() - 86_400_000);
+  if (date === today.toISOString().slice(0, 10)) return "Hoje";
+  if (date === yesterday.toISOString().slice(0, 10)) return "Ontem";
+  const [y, m, d] = date.split("-").map(Number);
+  return new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(
+    new Date(Date.UTC(y, m - 1, d)),
+  );
+}

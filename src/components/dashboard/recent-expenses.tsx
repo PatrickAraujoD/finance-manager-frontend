@@ -4,12 +4,12 @@ import { ArrowRight, Paperclip } from "lucide-react";
 import Link from "next/link";
 import { useCategories, useExpenses } from "@/lib/hooks";
 import { formatDate, formatMoney } from "@/lib/format";
-import { colorAt } from "./palette";
+import { categoryColor, softStyle } from "./palette";
 
 export function RecentExpenses() {
   const { data, isLoading } = useExpenses({ limit: 5 });
   const { data: categories } = useCategories();
-  const names = new Map(categories?.map((c, i) => [c.id, { name: c.name, color: colorAt(i) }]));
+  const names = new Map(categories?.map((c) => [c.id, { name: c.name, color: categoryColor(c.id) }]));
 
   return (
     <div className="card bg-base-100 shadow-sm">
@@ -36,8 +36,8 @@ export function RecentExpenses() {
               return (
                 <li key={expense.id} className="list-row items-center px-0">
                   <span
-                    className="grid size-9 place-items-center rounded-xl text-sm font-bold text-base-100"
-                    style={{ background: category?.color ?? "var(--color-neutral)" }}
+                    className="grid size-9 place-items-center rounded-xl text-sm font-bold"
+                    style={softStyle(category?.color ?? "var(--color-neutral)")}
                   >
                     {(category?.name ?? "?")[0].toUpperCase()}
                   </span>
