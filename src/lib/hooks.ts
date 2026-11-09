@@ -6,6 +6,11 @@ import type {
   Category,
   ExpensePage,
   Income,
+  Loan,
+  LoanPage,
+  LoanPayment,
+  LoansSummary,
+  LoanStatus,
   ManagedUser,
   ReportByCategory,
   ReportByDay,
@@ -59,3 +64,23 @@ export interface ExpenseFilters {
 
 export const useExpenses = (filters: ExpenseFilters) =>
   useSWR<ExpensePage>(["/expenses", { ...filters }], fetcher, { ...opts, keepPreviousData: true });
+
+export interface LoanFilters {
+  borrower?: string;
+  status?: LoanStatus;
+  limit?: number;
+  offset?: number;
+}
+
+export const useLoans = (filters: LoanFilters) =>
+  useSWR<LoanPage>(["/loans", { ...filters }], fetcher, { ...opts, keepPreviousData: true });
+
+export const useLoansSummary = (borrower?: string) =>
+  useSWR<LoansSummary>(["/loans/summary", { borrower }], fetcher, opts);
+
+export const useLoan = (id: string) => useSWR<Loan>(`/loans/${id}`, fetcher, opts);
+
+export const useLoanPayments = (id: string) => useSWR<LoanPayment[]>(`/loans/${id}/payments`, fetcher, opts);
+
+export const isLoansKey = (key: unknown) =>
+  typeof key === "string" ? key.startsWith("/loans") : Array.isArray(key) && String(key[0]).startsWith("/loans");

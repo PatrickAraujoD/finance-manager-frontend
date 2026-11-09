@@ -2,6 +2,7 @@
 
 import {
   FolderTree,
+  HandCoins,
   LayoutDashboard,
   LogOut,
   Plus,
@@ -27,6 +28,7 @@ interface NavItem {
 const ITEMS: NavItem[] = [
   { href: "/", label: "Início", icon: LayoutDashboard },
   { href: "/expenses", label: "Gastos", icon: Receipt },
+  { href: "/loans", label: "Empréstimos", icon: HandCoins },
   { href: "/categories", label: "Categorias", icon: FolderTree },
   { href: "/income", label: "Salário", icon: WalletCards },
   { href: "/users", label: "Usuários", icon: Users, adminOnly: true },

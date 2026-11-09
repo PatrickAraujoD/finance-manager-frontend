@@ -81,3 +81,56 @@ export interface ReportIncomeVsSpent {
   remainingCents: number | null;
   percentSpent: number | null;
 }
+
+export type LoanStatus = "OPEN" | "PAID" | "OVERDUE";
+export type PaymentMethod = "CASH" | "PIX";
+
+export interface Loan {
+  id: string;
+  borrowerName: string;
+  amountCents: number;
+  dueDate: string;
+  expenseId: string | null;
+  paidCents: number;
+  remainingCents: number;
+  status: LoanStatus;
+  createdAt: string;
+}
+
+export interface LoanPage {
+  items: Loan[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface LoanPayment {
+  id: string;
+  loanId: string;
+  amountCents: number;
+  method: PaymentMethod;
+  receiptId: string | null;
+  paidAt: string;
+  createdAt: string;
+}
+
+export interface LoanTotals {
+  totalLentCents: number;
+  paidCents: number;
+  owedCents: number;
+  upcomingCents: number;
+  overdueCents: number;
+}
+
+export interface BorrowerSummary extends LoanTotals {
+  borrowerName: string;
+  loansCount: number;
+  overdueLoansCount: number;
+  nextDueDate: string | null;
+}
+
+export interface LoansSummary {
+  items: BorrowerSummary[];
+  totals: LoanTotals;
+  truncated: boolean;
+}
