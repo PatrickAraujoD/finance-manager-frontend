@@ -18,7 +18,7 @@ const opts = { shouldRetryOnError: false, revalidateOnFocus: false } as const;
 
 export const useCategories = () => useSWR<Category[]>("/categories", fetcher, opts);
 
-export const useUsers = () => useSWR<ManagedUser[]>("/users", fetcher, opts);
+export const useUsers = (enabled = true) => useSWR<ManagedUser[]>(enabled ? "/users" : null, fetcher, opts);
 
 export const useIncome = (month: string) =>
   useSWR<Income | null>(
