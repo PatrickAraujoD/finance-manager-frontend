@@ -10,7 +10,7 @@ export function IncomeMeter({ month, summary }: { month: string; summary?: Repor
     return (
       <div className="flex h-full flex-col items-start justify-center gap-3">
         <p className="text-sm opacity-70">Cadastre o salário deste mês para acompanhar quanto já foi gasto.</p>
-        <Link href={`/income?month=${month}`} className="btn btn-primary btn-sm">
+        <Link href={`/income?month=${month}`} className="btn btn-brand btn-sm">
           Informar salário
         </Link>
       </div>

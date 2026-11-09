@@ -113,7 +113,7 @@ export function CategoriesView() {
         title="Categorias"
         description="Organize seus gastos do seu jeito."
         actions={
-          <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>
+          <button type="button" className="btn btn-brand btn-sm" onClick={openCreate}>
             <Plus className="size-4" /> Nova categoria
           </button>
         }
@@ -148,7 +148,7 @@ export function CategoriesView() {
               <div className="card items-center gap-2 border-2 border-dashed border-base-300 p-8 text-center">
                 <p className="font-semibold">Você ainda não criou categorias</p>
                 <p className="text-sm opacity-70">Crie as suas, como Mercado, Transporte ou Lazer.</p>
-                <button type="button" className="btn btn-primary btn-sm mt-1" onClick={openCreate}><Plus className="size-4" /> Criar categoria</button>
+                <button type="button" className="btn btn-brand btn-sm mt-1" onClick={openCreate}><Plus className="size-4" /> Criar categoria</button>
               </div>
             )}
           </section>
@@ -186,7 +186,7 @@ export function CategoriesView() {
           )}
           <div className="modal-action">
             <button type="button" className="btn btn-ghost" onClick={() => setEditing(null)} disabled={pending}>Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={pending}>
+            <button type="submit" className="btn btn-brand" disabled={pending}>
               {pending && <Loader2 className="size-4 animate-spin" />} Salvar
             </button>
           </div>

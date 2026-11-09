@@ -83,7 +83,7 @@ export function LoginForm() {
         />
       </label>
 
-      <button type="submit" disabled={pending} className="btn btn-primary mt-2">
+      <button type="submit" disabled={pending} className="btn btn-brand mt-2">
         {pending ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
         Entrar
       </button>

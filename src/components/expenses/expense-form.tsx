@@ -172,7 +172,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
 
         <div className="card-actions justify-end">
           <button type="button" className="btn btn-ghost" onClick={() => router.back()} disabled={pending}>Cancelar</button>
-          <button type="submit" className="btn btn-primary" disabled={pending}>
+          <button type="submit" className="btn btn-brand" disabled={pending}>
             {pending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
             Salvar gasto
           </button>

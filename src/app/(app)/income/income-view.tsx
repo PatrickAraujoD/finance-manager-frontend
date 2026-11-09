@@ -87,7 +87,7 @@ export function IncomeView() {
                 className="text-lg font-semibold"
               />
             </label>
-            <button type="submit" disabled={pending} className="btn btn-primary">
+            <button type="submit" disabled={pending} className="btn btn-brand">
               {pending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
               Salvar salário
             </button>
