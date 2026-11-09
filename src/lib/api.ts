@@ -2,7 +2,8 @@
 
 import { getSession, signOut } from "next-auth/react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+/** Rota do Next que repassa para a API (ver rewrites em next.config.ts): sem CORS no navegador. */
+const API_BASE = "/backend";
 
 export class ApiError extends Error {
   constructor(
@@ -11,6 +12,25 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = "ApiError";
+  }
+}
+
+const NETWORK_ERROR = "Não foi possível falar com a API. Confira se ela está no ar.";
+
+function buildUrl(path: string, query?: RequestOptions["query"]): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (value !== undefined && value !== "") params.set(key, String(value));
+  }
+  const qs = params.toString();
+  return `${API_BASE}${path}${qs ? `?${qs}` : ""}`;
+}
+
+async function request(url: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, { ...init, cache: "no-store" });
+  } catch {
+    throw new ApiError(0, NETWORK_ERROR);
   }
 }
 
@@ -52,11 +72,6 @@ async function authorizedFetch(path: string, opts: RequestOptions): Promise<Resp
     throw new ApiError(401, STATUS_MESSAGES[401]);
   }
 
-  const url = new URL(path, API_URL);
-  for (const [key, value] of Object.entries(opts.query ?? {})) {
-    if (value !== undefined && value !== "") url.searchParams.set(key, String(value));
-  }
-
   const headers: Record<string, string> = { Authorization: `Bearer ${session.accessToken}` };
   let body: BodyInit | undefined;
   if (opts.form) {
@@ -66,7 +81,7 @@ async function authorizedFetch(path: string, opts: RequestOptions): Promise<Resp
     body = JSON.stringify(opts.body);
   }
 
-  const res = await fetch(url, { method: opts.method ?? "GET", headers, body, cache: "no-store" });
+  const res = await request(buildUrl(path, opts.query), { method: opts.method ?? "GET", headers, body });
   if (res.status === 401) {
     await signOut({ callbackUrl: "/login" });
   }
@@ -88,11 +103,10 @@ export async function apiBlob(path: string): Promise<Blob> {
 
 /** Rotas publicas (cadastro): sem token. */
 export async function publicApi<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(new URL(path, API_URL), {
+  const res = await request(buildUrl(path), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    cache: "no-store",
   });
   if (!res.ok) throw await toError(res);
   return (await res.json()) as T;

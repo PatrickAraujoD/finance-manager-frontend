@@ -12,6 +12,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Tudo exige sessao, exceto login, cadastro, rotas do NextAuth e arquivos estaticos.
-  matcher: ["/((?!login|register|api/auth|_next/static|_next/image|favicon.ico).*)"],
+  // Tudo exige sessao, exceto login, cadastro, rotas do NextAuth, o repasse para a API (/backend) e arquivos estaticos.
+  matcher: ["/((?!login|register|api/auth|backend|_next/static|_next/image|favicon.ico).*)"],
 };
