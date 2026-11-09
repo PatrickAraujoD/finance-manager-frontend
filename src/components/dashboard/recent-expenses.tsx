@@ -4,12 +4,14 @@ import { ArrowRight, Paperclip } from "lucide-react";
 import Link from "next/link";
 import { useCategories, useExpenses } from "@/lib/hooks";
 import { formatDate, formatMoney } from "@/lib/format";
-import { categoryColor, softStyle } from "./palette";
+import { useCategoryColor } from "@/lib/use-category-color";
+import { softStyle } from "./palette";
 
 export function RecentExpenses() {
   const { data, isLoading } = useExpenses({ limit: 5 });
   const { data: categories } = useCategories();
-  const names = new Map(categories?.map((c) => [c.id, { name: c.name, color: categoryColor(c.id) }]));
+  const colorOf = useCategoryColor();
+  const names = new Map(categories?.map((c) => [c.id, { name: c.name, color: colorOf(c.id) }]));
 
   return (
     <div className="card bg-base-100 shadow-sm">

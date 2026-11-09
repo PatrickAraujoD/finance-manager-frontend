@@ -3,9 +3,10 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { ReportByCategory } from "@/lib/api-types";
 import { formatMoney } from "@/lib/format";
-import { categoryColor } from "./palette";
+import { useCategoryColor } from "@/lib/use-category-color";
 
 export function CategoryDonut({ data }: { data?: ReportByCategory }) {
+  const colorOf = useCategoryColor();
   if (!data) return <div className="skeleton h-56 w-full" />;
   if (data.items.length === 0) {
     return <p className="grid h-56 place-items-center text-sm opacity-60">Nenhum gasto neste mês.</p>;
@@ -18,7 +19,7 @@ export function CategoryDonut({ data }: { data?: ReportByCategory }) {
           <PieChart>
             <Pie data={data.items} dataKey="totalCents" nameKey="categoryName" innerRadius="68%" outerRadius="100%" paddingAngle={2} stroke="none">
               {data.items.map((item) => (
-                <Cell key={item.categoryId} fill={categoryColor(item.categoryId)} />
+                <Cell key={item.categoryId} fill={colorOf(item.categoryId)} />
               ))}
             </Pie>
             <Tooltip
@@ -38,7 +39,7 @@ export function CategoryDonut({ data }: { data?: ReportByCategory }) {
       <ul className="w-full space-y-2 text-sm">
         {data.items.slice(0, 6).map((item) => (
           <li key={item.categoryId} className="flex items-center gap-2">
-            <span className="size-2.5 shrink-0 rounded-full" style={{ background: categoryColor(item.categoryId) }} />
+            <span className="size-2.5 shrink-0 rounded-full" style={{ background: colorOf(item.categoryId) }} />
             <span className="flex-1 truncate">{item.categoryName}</span>
             <span className="font-semibold">{item.percentage.toFixed(0)}%</span>
           </li>

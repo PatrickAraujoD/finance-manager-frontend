@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { categoryColor, softStyle } from "@/components/dashboard/palette";
+import { softStyle } from "@/components/dashboard/palette";
 import { MonthPicker } from "@/components/month-picker";
 import { PageHeader } from "@/components/page-header";
 import { useToast } from "@/components/toast";
 import { api } from "@/lib/api";
 import type { Expense } from "@/lib/api-types";
 import { currentMonth, dayLabel, formatDate, formatDayShort, formatMoney, monthRange } from "@/lib/format";
+import { useCategoryColor } from "@/lib/use-category-color";
 import { useByCategory, useByDay, useCategories, useExpenses } from "@/lib/hooks";
 
 const PAGE_SIZE = 100;
@@ -32,6 +33,7 @@ export function ExpensesView() {
   const { mutate } = useSWRConfig();
 
   const { data: categories } = useCategories();
+  const colorOf = useCategoryColor();
   const names = new Map(categories?.map((c) => [c.id, c.name]));
   const { data, isLoading, error } = useExpenses({
     ...monthRange(month),
@@ -129,7 +131,7 @@ export function ExpensesView() {
               <ul className="divide-y divide-base-200">
                 {items.map((expense) => {
                   const name = names.get(expense.categoryId) ?? "Sem categoria";
-                  const color = categoryColor(expense.categoryId);
+                  const color = colorOf(expense.categoryId);
                   return (
                     <li key={expense.id} className="group flex items-center gap-3 px-4 py-3 transition hover:bg-base-200/50">
                       <span className="grid size-10 shrink-0 place-items-center rounded-xl text-sm font-bold" style={softStyle(color)}>

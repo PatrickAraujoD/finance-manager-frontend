@@ -11,11 +11,10 @@ export const CHART_COLORS = [
 
 export const colorAt = (index: number) => CHART_COLORS[index % CHART_COLORS.length];
 
-/** Cor estavel por categoria: a mesma em dashboard, gastos e categorias, em qualquer ordem. */
-export function categoryColor(categoryId: string): string {
-  let hash = 0;
-  for (let i = 0; i < categoryId.length; i++) hash = (hash * 31 + categoryId.charCodeAt(i)) >>> 0;
-  return CHART_COLORS[hash % CHART_COLORS.length];
+/** Cor da categoria na posicao `index`: 7 do tema e, alem delas, tons distribuidos pelo circulo cromatico. */
+export function colorForIndex(index: number): string {
+  if (index < CHART_COLORS.length) return CHART_COLORS[index];
+  return `oklch(72% 0.15 ${Math.round(((index - CHART_COLORS.length + 1) * 137.508) % 360)})`;
 }
 
 /** Fundo suave e texto na cor da categoria, para avatares e etiquetas. */

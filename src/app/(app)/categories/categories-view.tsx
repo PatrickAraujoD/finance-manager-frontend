@@ -5,12 +5,13 @@ import { useSession } from "next-auth/react";
 import { useState, type FormEvent } from "react";
 import { useSWRConfig } from "swr";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { categoryColor, softStyle } from "@/components/dashboard/palette";
+import { softStyle } from "@/components/dashboard/palette";
 import { PageHeader } from "@/components/page-header";
 import { useToast } from "@/components/toast";
 import { api } from "@/lib/api";
 import type { Category } from "@/lib/api-types";
 import { useCategories } from "@/lib/hooks";
+import { useCategoryColor } from "@/lib/use-category-color";
 
 type Editing = { mode: "create" } | { mode: "rename"; category: Category };
 
@@ -18,6 +19,7 @@ export function CategoriesView() {
   const { data: session } = useSession();
   const isAdmin = session?.user.role === "A";
   const { data: categories, isLoading, error } = useCategories();
+  const colorOf = useCategoryColor();
   const { mutate } = useSWRConfig();
   const toast = useToast();
 
@@ -34,7 +36,7 @@ export function CategoriesView() {
   const renderCard = (category: Category) => (
     <li key={category.id} className="card bg-base-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="card-body flex-row items-center gap-3 p-4">
-        <span className="grid size-11 shrink-0 place-items-center rounded-2xl text-base font-bold" style={softStyle(categoryColor(category.id))}>
+        <span className="grid size-11 shrink-0 place-items-center rounded-2xl text-base font-bold" style={softStyle(colorOf(category.id))}>
           {category.name[0].toUpperCase()}
         </span>
         <div className="min-w-0 flex-1">

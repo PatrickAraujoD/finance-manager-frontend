@@ -4,12 +4,13 @@ import { CalendarDays, Download, Loader2, Paperclip, Save, Users } from "lucide-
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useSWRConfig } from "swr";
-import { categoryColor, softStyle } from "@/components/dashboard/palette";
+import { softStyle } from "@/components/dashboard/palette";
 import { useToast } from "@/components/toast";
 import { api, apiBlob } from "@/lib/api";
 import type { Expense, ReceiptUpload } from "@/lib/api-types";
 import { centsToInput, formatDate, formatMoney, parseMoneyToCents, todayIso } from "@/lib/format";
 import { useCategories } from "@/lib/hooks";
+import { useCategoryColor } from "@/lib/use-category-color";
 import { ReceiptUploader } from "./receipt-uploader";
 
 const MAX_CENTS = 1_000_000_000;
@@ -25,6 +26,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
   const toast = useToast();
   const { mutate } = useSWRConfig();
   const { data: categories } = useCategories();
+  const colorOf = useCategoryColor();
 
   const [paidAlone, setPaidAlone] = useState(expense?.paidAlone ?? true);
   const [receipt, setReceipt] = useState<(ReceiptUpload & { fileName: string }) | null>(null);
@@ -189,7 +191,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
           </div>
           <dl className="space-y-3 text-sm">
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-xl text-sm font-bold" style={softStyle(category ? categoryColor(category.id) : "var(--color-neutral)")}>
+              <span className="grid size-9 place-items-center rounded-xl text-sm font-bold" style={softStyle(category ? colorOf(category.id) : "var(--color-neutral)")}>
                 {category ? category.name[0].toUpperCase() : "?"}
               </span>
               <div>
