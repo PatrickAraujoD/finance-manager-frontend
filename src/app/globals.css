@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "daisyui" {
+  themes: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "fm-dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: oklch(18% 0.03 275);
+  --color-base-200: oklch(15% 0.03 275);
+  --color-base-300: oklch(30% 0.04 275);
+  --color-base-content: oklch(94% 0.01 275);
+  --color-primary: oklch(68% 0.19 285);
+  --color-primary-content: oklch(14% 0.03 285);
+  --color-secondary: oklch(84% 0.14 180);
+  --color-secondary-content: oklch(20% 0.04 180);
+  --color-accent: oklch(78% 0.16 50);
+  --color-accent-content: oklch(20% 0.04 50);
+  --color-neutral: oklch(25% 0.04 275);
+  --color-neutral-content: oklch(92% 0.01 275);
+  --color-info: oklch(78% 0.13 230);
+  --color-success: oklch(82% 0.16 165);
+  --color-warning: oklch(84% 0.15 85);
+  --color-error: oklch(72% 0.19 15);
+  --radius-selector: 1rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+}
+
+@plugin "daisyui/theme" {
+  name: "fm-light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(97% 0.008 275);
+  --color-base-300: oklch(91% 0.015 275);
+  --color-base-content: oklch(24% 0.04 275);
+  --color-primary: oklch(55% 0.22 285);
+  --color-primary-content: oklch(98% 0.01 285);
+  --color-secondary: oklch(62% 0.12 180);
+  --color-secondary-content: oklch(98% 0.01 180);
+  --color-accent: oklch(70% 0.17 50);
+  --color-accent-content: oklch(22% 0.04 50);
+  --color-neutral: oklch(30% 0.05 275);
+  --color-neutral-content: oklch(96% 0.01 275);
+  --color-info: oklch(65% 0.14 230);
+  --color-success: oklch(62% 0.15 165);
+  --color-warning: oklch(78% 0.16 85);
+  --color-error: oklch(60% 0.21 20);
+  --radius-selector: 1rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--color-base-100) 70%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+}
+
+@utility text-gradient {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
