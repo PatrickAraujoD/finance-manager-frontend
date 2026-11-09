@@ -3,11 +3,11 @@
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { CategoryDonut } from "@/components/dashboard/category-donut";
-import { DayBars } from "@/components/dashboard/day-bars";
 import { EvolutionChart } from "@/components/dashboard/evolution-chart";
 import { IncomeMeter } from "@/components/dashboard/income-meter";
 import { KpiCards } from "@/components/dashboard/kpi-cards";
 import { RecentExpenses } from "@/components/dashboard/recent-expenses";
+import { RecentLoans } from "@/components/dashboard/recent-loans";
 import { MonthPicker } from "@/components/month-picker";
 import { currentMonth } from "@/lib/format";
 import { useByCategory, useByDay, useEvolution, useIncomeVsSpent } from "@/lib/hooks";
@@ -63,9 +63,7 @@ export function Dashboard() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Panel title="Gasto por dia">
-          <DayBars data={byDay.data} />
-        </Panel>
+        <RecentLoans />
         <RecentExpenses />
         <Panel title="Salário x gasto">
           <IncomeMeter month={month} summary={summary.data} />
