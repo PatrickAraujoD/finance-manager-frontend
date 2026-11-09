@@ -44,6 +44,15 @@ const STATUS_MESSAGES: Record<number, string> = {
   429: "Muitas tentativas. Aguarde um pouco e tente de novo.",
 };
 
+async function readJson<T>(res: Response): Promise<T> {
+  try {
+    return (await res.json()) as T;
+  } catch {
+    // HTML no lugar de JSON: o /backend nao esta chegando na API (API_URL errada ou API fora).
+    throw new ApiError(502, "A API respondeu algo inesperado. Confira o API_URL do frontend.");
+  }
+}
+
 async function toError(res: Response): Promise<ApiError> {
   let detail: string | undefined;
   try {
@@ -92,7 +101,7 @@ export async function api<T>(path: string, opts: RequestOptions = {}): Promise<T
   const res = await authorizedFetch(path, opts);
   if (!res.ok) throw await toError(res);
   if (res.status === 204) return undefined as T;
-  return (await res.json()) as T;
+  return readJson<T>(res);
 }
 
 export async function apiBlob(path: string): Promise<Blob> {
@@ -109,7 +118,7 @@ export async function publicApi<T>(path: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   });
   if (!res.ok) throw await toError(res);
-  return (await res.json()) as T;
+  return readJson<T>(res);
 }
 
 export const fetcher = <T>(key: string | [string, Record<string, string | number | undefined>]) =>
