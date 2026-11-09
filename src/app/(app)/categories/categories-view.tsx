@@ -1,10 +1,12 @@
 "use client";
 
-import { Globe, Loader2, Lock, Pencil, Plus, Trash2 } from "lucide-react";
+import { FolderTree, Globe, Loader2, Lock, Pencil, Plus, Tag, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState, type FormEvent } from "react";
 import { useSWRConfig } from "swr";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { categoryColor, softStyle } from "@/components/dashboard/palette";
+import { PageHeader } from "@/components/page-header";
 import { useToast } from "@/components/toast";
 import { api } from "@/lib/api";
 import type { Category } from "@/lib/api-types";
@@ -25,6 +27,37 @@ export function CategoriesView() {
   const [formError, setFormError] = useState<string | null>(null);
 
   const canManage = (category: Category) => !category.global || isAdmin;
+  const globals = categories?.filter((c) => c.global) ?? [];
+  const own = categories?.filter((c) => !c.global) ?? [];
+  const openCreate = () => { setFormError(null); setEditing({ mode: "create" }); };
+
+  const renderCard = (category: Category) => (
+    <li key={category.id} className="card bg-base-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div className="card-body flex-row items-center gap-3 p-4">
+        <span className="grid size-11 shrink-0 place-items-center rounded-2xl text-base font-bold" style={softStyle(categoryColor(category.id))}>
+          {category.name[0].toUpperCase()}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-semibold">{category.name}</p>
+          <p className="flex items-center gap-1 text-xs opacity-60">
+            {category.global ? <><Globe className="size-3" /> Vale para todos</> : <><Lock className="size-3" /> Só você vê</>}
+          </p>
+        </div>
+        {canManage(category) ? (
+          <div className="flex gap-1">
+            <button type="button" className="btn btn-ghost btn-sm btn-square" aria-label={`Renomear ${category.name}`} onClick={() => { setFormError(null); setEditing({ mode: "rename", category }); }}>
+              <Pencil className="size-4" />
+            </button>
+            <button type="button" className="btn btn-ghost btn-sm btn-square text-error" aria-label={`Excluir ${category.name}`} onClick={() => setToDelete(category)}>
+              <Trash2 className="size-4" />
+            </button>
+          </div>
+        ) : (
+          <span className="badge badge-ghost badge-sm">Somente leitura</span>
+        )}
+      </div>
+    </li>
+  );
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,54 +105,60 @@ export function CategoriesView() {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Categorias</h1>
-          <p className="text-sm opacity-70">Organize seus gastos. Até 100 categorias próprias.</p>
+    <div className="space-y-6">
+      <PageHeader
+        icon={FolderTree}
+        title="Categorias"
+        description="Organize seus gastos do seu jeito."
+        actions={
+          <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>
+            <Plus className="size-4" /> Nova categoria
+          </button>
+        }
+      />
+
+      <div className="stats stats-vertical w-full bg-base-100 shadow-sm sm:stats-horizontal">
+        <div className="stat">
+          <div className="stat-figure text-info"><Globe className="size-7" /></div>
+          <div className="stat-title">Globais</div>
+          <div className="stat-value text-2xl">{isLoading ? "—" : globals.length}</div>
+          <div className="stat-desc">Criadas pelo admin</div>
         </div>
-        <button type="button" className="btn btn-primary btn-sm" onClick={() => { setFormError(null); setEditing({ mode: "create" }); }}>
-          <Plus className="size-4" /> Nova categoria
-        </button>
+        <div className="stat">
+          <div className="stat-figure text-primary"><Tag className="size-7" /></div>
+          <div className="stat-title">Suas categorias</div>
+          <div className="stat-value text-2xl">{isLoading ? "—" : `${own.length} / 100`}</div>
+          <div className="stat-desc"><progress className="progress progress-primary w-28" value={own.length} max={100} /></div>
+        </div>
       </div>
 
       {error && <div role="alert" className="alert alert-error alert-soft">Não foi possível carregar as categorias.</div>}
 
-      <div className="card bg-base-100 shadow-sm">
-        {isLoading ? (
-          <div className="space-y-3 p-5">
-            {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton h-12 w-full" />)}
-          </div>
-        ) : !categories?.length ? (
-          <p className="p-8 text-center text-sm opacity-60">Nenhuma categoria ainda. Crie a primeira.</p>
-        ) : (
-          <ul className="list">
-            {categories.map((category) => (
-              <li key={category.id} className="list-row items-center">
-                <span className="grid size-10 place-items-center rounded-xl bg-base-200">
-                  {category.global ? <Globe className="size-4 text-info" /> : <Lock className="size-4 opacity-60" />}
-                </span>
-                <div>
-                  <p className="font-medium">{category.name}</p>
-                  <p className="text-xs opacity-60">{category.global ? "Global, vale para todos" : "Só você vê"}</p>
-                </div>
-                {canManage(category) ? (
-                  <div className="flex gap-1">
-                    <button type="button" className="btn btn-ghost btn-sm btn-square" aria-label={`Renomear ${category.name}`} onClick={() => { setFormError(null); setEditing({ mode: "rename", category }); }}>
-                      <Pencil className="size-4" />
-                    </button>
-                    <button type="button" className="btn btn-ghost btn-sm btn-square text-error" aria-label={`Excluir ${category.name}`} onClick={() => setToDelete(category)}>
-                      <Trash2 className="size-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <span className="badge badge-ghost">Somente leitura</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {isLoading ? (
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map((i) => <div key={i} className="skeleton h-20 w-full" />)}</div>
+      ) : (
+        <>
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold">Suas categorias</h2>
+            {own.length ? (
+              <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{own.map(renderCard)}</ul>
+            ) : (
+              <div className="card items-center gap-2 border-2 border-dashed border-base-300 p-8 text-center">
+                <p className="font-semibold">Você ainda não criou categorias</p>
+                <p className="text-sm opacity-70">Crie as suas, como Mercado, Transporte ou Lazer.</p>
+                <button type="button" className="btn btn-primary btn-sm mt-1" onClick={openCreate}><Plus className="size-4" /> Criar categoria</button>
+              </div>
+            )}
+          </section>
+
+          {globals.length > 0 && (
+            <section className="space-y-3">
+              <h2 className="text-lg font-bold">Globais</h2>
+              <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{globals.map(renderCard)}</ul>
+            </section>
+          )}
+        </>
+      )}
 
       <dialog className={`modal ${editing ? "modal-open" : ""}`}>
         <form onSubmit={onSubmit} className="modal-box space-y-3" key={editing ? (editing.mode === "rename" ? editing.category.id : "new") : "closed"}>
