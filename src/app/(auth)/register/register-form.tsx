@@ -1,13 +1,16 @@
 "use client";
 
 import { Loader2, UserPlus } from "lucide-react";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { useToast } from "@/components/toast";
 import { publicApi } from "@/lib/api";
 
 export function RegisterForm() {
   const router = useRouter();
+  const toast = useToast();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -20,13 +23,10 @@ export function RegisterForm() {
     }
     setPending(true);
     setError(null);
+    const email = String(form.get("email")).trim();
+    const password = String(form.get("password"));
     try {
-      await publicApi("/auth/register", {
-        name: String(form.get("name")).trim(),
-        email: String(form.get("email")).trim(),
-        password: String(form.get("password")),
-      });
-      router.replace("/login?registered=1");
+      await publicApi("/auth/register", { name: String(form.get("name")).trim(), email, password });
     } catch (err) {
       setError(
         err instanceof Error && err.message.includes("conflita")
@@ -36,7 +36,18 @@ export function RegisterForm() {
             : "Não foi possível criar a conta.",
       );
       setPending(false);
+      return;
     }
+
+    // Conta criada: entra direto, sem pedir e-mail e senha de novo.
+    const result = await signIn("credentials", { email, password, redirect: false });
+    if (result?.ok) {
+      toast.success("Conta criada! Você já está logado.");
+      router.replace("/");
+      router.refresh();
+      return;
+    }
+    router.replace("/login?registered=1");
   }
 
   return (
