@@ -7,7 +7,7 @@ export function ThemeToggle() {
   const { isDark, setPreference } = useTheme();
 
   return (
-    <label className="toggle toggle-lg text-base-content" title={isDark ? "Tema escuro" : "Tema claro"}>
+    <label className="toggle toggle-lg text-base-content [--toggle-p:0px]" title={isDark ? "Tema escuro" : "Tema claro"}>
       <input
         type="checkbox"
         checked={isDark}
