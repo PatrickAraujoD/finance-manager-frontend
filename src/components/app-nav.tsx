@@ -71,9 +71,9 @@ export function AppNav() {
             <ThemeToggle />
             <div className="dropdown dropdown-end">
               <button type="button" className="avatar avatar-placeholder cursor-pointer" aria-label="Menu da conta">
-                <span className="w-9 rounded-full bg-primary text-primary-content text-sm font-bold">
-                  {initials(session?.user.name)}
-                </span>
+                <div className="w-9 rounded-full bg-primary text-primary-content">
+                  <span className="text-sm font-bold">{initials(session?.user.name)}</span>
+                </div>
               </button>
               <ul className="menu dropdown-content z-40 mt-3 w-60 rounded-box bg-base-100 p-2 shadow-lg">
                 <li className="menu-title normal-case">
