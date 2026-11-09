@@ -78,9 +78,9 @@ export function UsersView() {
               return (
                 <li key={user.id} className={`list-row items-center ${user.active ? "" : "opacity-60"}`}>
                   <div className="avatar avatar-placeholder">
-                    <span className={`w-11 rounded-2xl text-sm font-bold ${user.role === "A" ? "bg-primary text-primary-content" : "bg-base-300"}`}>
-                      {initials(user.name)}
-                    </span>
+                    <div className={`w-11 rounded-full ${user.role === "A" ? "bg-primary text-primary-content" : "bg-base-300"}`}>
+                      <span className="text-sm font-bold">{initials(user.name)}</span>
+                    </div>
                   </div>
                   <div className="min-w-0">
                     <p className="flex items-center gap-2 font-semibold">
