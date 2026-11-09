@@ -1,7 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
-/** Checagem otimista: so confere se existe sessao. A API valida o token de verdade. */
 export async function proxy(request: NextRequest) {
   const token = await getToken({ req: request });
   if (token && !token.error) return NextResponse.next();
@@ -12,6 +11,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Tudo exige sessao, exceto login, cadastro, rotas do NextAuth, o repasse para a API (/backend) e arquivos estaticos.
   matcher: ["/((?!login|register|api/auth|backend|_next/static|_next/image|favicon.ico).*)"],
 };

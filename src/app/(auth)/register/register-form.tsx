@@ -39,7 +39,6 @@ export function RegisterForm() {
       return;
     }
 
-    // Conta criada: entra direto, sem pedir e-mail e senha de novo.
     const result = await signIn("credentials", { email, password, redirect: false });
     if (result?.ok) {
       toast.success("Conta criada! Você já está logado.");

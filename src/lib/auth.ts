@@ -5,10 +5,9 @@ import type { Profile, TokenPair } from "./api-types";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3000";
 
-/** Renova o access token 60 s antes de ele vencer. */
 const REFRESH_MARGIN_MS = 60_000;
 
-/** O backend rotaciona o refresh token: reusar um token ja trocado revoga a sessao inteira. */
+/** Reusar um refresh token ja trocado revoga a sessao inteira no backend. */
 const REUSE_WINDOW_MS = 30_000;
 
 function tokenExpiry(accessToken: string): number {
@@ -31,8 +30,7 @@ async function postJson<T>(path: string, body: unknown): Promise<{ status: numbe
   return { status: res.status, data };
 }
 
-// Varias requisicoes de sessao chegam juntas (abas, SWR). Todas trazem o mesmo refresh token
-// antigo no cookie, entao dividimos a mesma troca entre elas em vez de gastar o token duas vezes.
+// Requisicoes simultaneas trazem o mesmo refresh token: dividem uma unica troca.
 const inflight = new Map<string, Promise<TokenPair | null>>();
 
 function rotateTokens(refreshToken: string): Promise<TokenPair | null> {

@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-/* `join` fica de fora: o CSS dele (`&>:where(...)` dentro de @media) e recusado pelo lightningcss
-   do Next em desenvolvimento. O equivalente abaixo cobre o uso do projeto. */
+/* `join` fica de fora: o CSS dele e recusado pelo lightningcss do Next no dev. */
 @plugin "daisyui" {
   themes: false;
   exclude: join;
@@ -111,7 +110,6 @@ body {
   }
 }
 
-/* Botao de destaque (acao principal): gradiente da marca com brilho. */
 @utility btn-brand {
   border: 0;
   font-weight: 700;

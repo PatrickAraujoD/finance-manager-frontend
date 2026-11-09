@@ -2,7 +2,6 @@
 
 import { getSession, signOut } from "next-auth/react";
 
-/** Rota do Next que repassa para a API (ver rewrites em next.config.ts): sem CORS no navegador. */
 const API_BASE = "/backend";
 
 export class ApiError extends Error {
@@ -48,20 +47,14 @@ async function readJson<T>(res: Response): Promise<T> {
   try {
     return (await res.json()) as T;
   } catch {
-    // HTML no lugar de JSON: o /backend nao esta chegando na API (API_URL errada ou API fora).
     throw new ApiError(502, "A API respondeu algo inesperado. Confira o API_URL do frontend.");
   }
 }
 
 async function toError(res: Response): Promise<ApiError> {
-  let detail: string | undefined;
-  try {
-    const body = await res.json();
-    detail = Array.isArray(body.message) ? body.message.join(" ") : body.message;
-  } catch {
-    // corpo vazio ou nao JSON
-  }
-  // 400/409 trazem a regra violada; os demais usam o texto padrao.
+  const body = await res.json().catch(() => null);
+  const message = body?.message;
+  const detail: string | undefined = Array.isArray(message) ? message.join(" ") : message;
   const useDetail = detail && (res.status === 400 || res.status === 409);
   return new ApiError(res.status, useDetail ? detail! : (STATUS_MESSAGES[res.status] ?? "Algo deu errado."));
 }
@@ -74,7 +67,6 @@ interface RequestOptions {
 }
 
 async function authorizedFetch(path: string, opts: RequestOptions): Promise<Response> {
-  // getSession passa pela rota do NextAuth, que renova o access token quando precisa.
   const session = await getSession();
   if (!session?.accessToken || session.error) {
     await signOut({ callbackUrl: "/login" });
@@ -110,7 +102,6 @@ export async function apiBlob(path: string): Promise<Blob> {
   return res.blob();
 }
 
-/** Rotas publicas (cadastro): sem token. */
 export async function publicApi<T>(path: string, body: unknown): Promise<T> {
   const res = await request(buildUrl(path), {
     method: "POST",

@@ -2,7 +2,6 @@ const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" 
 
 export const formatMoney = (cents: number) => brl.format(cents / 100);
 
-/** "1.234,56" ou "1234.56" para centavos inteiros; null se invalido. */
 export function parseMoneyToCents(input: string): number | null {
   const cleaned = input.trim().replace(/[R$\s]/g, "");
   if (!/^\d{1,3}(\.\d{3})*(,\d{1,2})?$|^\d+(,\d{1,2})?$|^\d+\.\d{1,2}$/.test(cleaned)) return null;
@@ -64,7 +63,6 @@ export function initials(name?: string | null): string {
     .join("");
 }
 
-/** "Hoje", "Ontem" ou "segunda-feira, 10 de novembro". */
 export function dayLabel(date: string): string {
   const today = new Date();
   const yesterday = new Date(today.getTime() - 86_400_000);

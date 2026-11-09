@@ -4,10 +4,6 @@ import { useMemo } from "react";
 import { colorForIndex } from "@/components/dashboard/palette";
 import { useCategories } from "./hooks";
 
-/**
- * Devolve a cor de cada categoria. A cor vem da posicao da categoria na lista ordenada por id,
- * entao duas categorias nunca repetem cor e ela e a mesma em todas as telas.
- */
 export function useCategoryColor() {
   const { data } = useCategories();
   const colors = useMemo(() => {
