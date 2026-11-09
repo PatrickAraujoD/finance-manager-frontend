@@ -6,7 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -38,12 +38,19 @@ function readStored(): ThemePreference {
   return "system";
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [preference, setPreferenceState] = useState<ThemePreference>("system");
+const listeners = new Set<() => void>();
 
-  useEffect(() => {
-    setPreferenceState(readStored());
-  }, []);
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  window.addEventListener("storage", listener);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const preference = useSyncExternalStore(subscribe, readStored, () => "system" as const);
 
   useEffect(() => {
     const apply = () => {
@@ -57,12 +64,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [preference]);
 
   const setPreference = useCallback((value: ThemePreference) => {
-    setPreferenceState(value);
     try {
       localStorage.setItem(STORAGE_KEY, value);
     } catch {
-      // ignora: a escolha vale so ate recarregar
+      // armazenamento indisponivel: a escolha nao persiste
     }
+    listeners.forEach((listener) => listener());
   }, []);
 
   const value = useMemo(() => ({ preference, setPreference }), [preference, setPreference]);
