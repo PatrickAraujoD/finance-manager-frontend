@@ -16,6 +16,8 @@ const STORAGE_KEY = "fm-theme";
 
 interface ThemeContextValue {
   preference: ThemePreference;
+  /** Tema realmente aplicado, ja considerando "system". */
+  isDark: boolean;
   setPreference: (value: ThemePreference) => void;
 }
 
@@ -49,7 +51,20 @@ function subscribe(listener: () => void) {
   };
 }
 
+const DARK_QUERY = "(prefers-color-scheme: dark)";
+
+function subscribeSystem(listener: () => void) {
+  const media = window.matchMedia(DARK_QUERY);
+  media.addEventListener("change", listener);
+  return () => media.removeEventListener("change", listener);
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const systemDark = useSyncExternalStore(
+    subscribeSystem,
+    () => window.matchMedia(DARK_QUERY).matches,
+    () => false,
+  );
   const preference = useSyncExternalStore(subscribe, readStored, () => "system" as const);
 
   useEffect(() => {
@@ -72,7 +87,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     listeners.forEach((listener) => listener());
   }, []);
 
-  const value = useMemo(() => ({ preference, setPreference }), [preference, setPreference]);
+  const isDark = preference === "dark" || (preference === "system" && systemDark);
+  const value = useMemo(() => ({ preference, isDark, setPreference }), [preference, isDark, setPreference]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
