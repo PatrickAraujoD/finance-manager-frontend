@@ -100,3 +100,30 @@ body {
     z-index: 1;
   }
 }
+
+/* Botao de destaque (acao principal): gradiente da marca com brilho. */
+@utility btn-brand {
+  border: 0;
+  font-weight: 700;
+  color: var(--color-primary-content);
+  background-image: linear-gradient(
+    135deg,
+    var(--color-primary),
+    color-mix(in oklab, var(--color-primary) 55%, var(--color-info))
+  );
+  box-shadow: 0 8px 20px -8px color-mix(in oklab, var(--color-primary) 70%, transparent);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    filter 150ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+    box-shadow: 0 12px 24px -8px color-mix(in oklab, var(--color-primary) 80%, transparent);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

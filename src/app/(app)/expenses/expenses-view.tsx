@@ -69,7 +69,7 @@ export function ExpensesView() {
         title="Gastos"
         description="Tudo o que você lançou, dia a dia."
         actions={
-          <Link href="/expenses/new" className="btn btn-primary btn-sm">
+          <Link href="/expenses/new" className="btn btn-brand">
             <Plus className="size-4" /> Novo gasto
           </Link>
         }
@@ -118,7 +118,7 @@ export function ExpensesView() {
           <span className="grid size-14 place-items-center rounded-2xl bg-base-200"><Receipt className="size-7 opacity-60" /></span>
           <p className="font-semibold">Nenhum gasto neste período</p>
           <p className="max-w-sm text-sm opacity-70">Lance um gasto e, se tiver o comprovante, anexe para o valor ser sugerido.</p>
-          <Link href="/expenses/new" className="btn btn-primary btn-sm"><Plus className="size-4" /> Registrar gasto</Link>
+          <Link href="/expenses/new" className="btn btn-brand btn-sm"><Plus className="size-4" /> Registrar gasto</Link>
         </div>
       ) : (
         <div className="space-y-4">

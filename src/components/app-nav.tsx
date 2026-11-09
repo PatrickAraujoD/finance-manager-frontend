@@ -64,7 +64,7 @@ export function AppNav() {
           </ul>
 
           <div className="navbar-end gap-2">
-            <Link href="/expenses/new" className="btn btn-primary btn-sm">
+            <Link href="/expenses/new" className="btn btn-brand btn-sm">
               <Plus className="size-4" />
               <span className="hidden sm:inline">Novo gasto</span>
             </Link>
