@@ -157,16 +157,16 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
           />
         </label>
 
-        <fieldset className="space-y-1.5">
-          <legend className="text-xs opacity-60">Forma de pagamento</legend>
-          <div role="radiogroup" aria-label="Forma de pagamento" className="join w-full">
+        <fieldset className="space-y-2 pb-1">
+          <legend className="mb-1 text-xs opacity-60">Forma de pagamento</legend>
+          <div role="radiogroup" aria-label="Forma de pagamento" className="grid grid-cols-3 gap-3">
             {PAYMENT_METHODS.map((m) => (
               <button
                 key={m.value}
                 type="button"
                 role="radio"
                 aria-checked={paymentMethod === m.value}
-                className={`btn join-item flex-1 ${paymentMethod === m.value ? "btn-primary" : ""}`}
+                className={`btn ${paymentMethod === m.value ? "btn-primary" : ""}`}
                 onClick={() => setPaymentMethod(m.value)}
               >
                 {m.label}
