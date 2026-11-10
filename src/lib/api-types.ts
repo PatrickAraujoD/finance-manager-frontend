@@ -28,12 +28,15 @@ export interface Income {
   amountCents: number;
 }
 
+export type ExpensePaymentMethod = "CREDIT" | "DEBIT" | "PIX";
+
 export interface Expense {
   id: string;
   categoryId: string;
   receiptId: string | null;
   amountCents: number;
   paidAlone: boolean;
+  paymentMethod: ExpensePaymentMethod;
   spentAt: string;
   description: string | null;
   createdAt: string;

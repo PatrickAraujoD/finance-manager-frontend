@@ -10,8 +10,9 @@ import { MonthPicker } from "@/components/month-picker";
 import { PageHeader } from "@/components/page-header";
 import { useToast } from "@/components/toast";
 import { api } from "@/lib/api";
-import type { Expense } from "@/lib/api-types";
+import type { Expense, ExpensePaymentMethod } from "@/lib/api-types";
 import { currentMonth, dayLabel, formatDate, formatDayShort, formatMoney, monthRange } from "@/lib/format";
+import { PAYMENT_METHODS, paymentMethodLabel } from "@/lib/payment-methods";
 import { useCategoryColor } from "@/lib/use-category-color";
 import { useByCategory, useByDay, useCategories, useExpenses } from "@/lib/hooks";
 
@@ -26,6 +27,7 @@ function groupByDay(items: Expense[]) {
 export function ExpensesView() {
   const [month, setMonth] = useState(currentMonth);
   const [categoryId, setCategoryId] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<ExpensePaymentMethod | "">("");
   const [page, setPage] = useState(0);
   const [toDelete, setToDelete] = useState<Expense | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -38,6 +40,7 @@ export function ExpensesView() {
   const { data, isLoading, error } = useExpenses({
     ...monthRange(month),
     categoryId: categoryId || undefined,
+    paymentMethod: paymentMethod || undefined,
     limit: PAGE_SIZE,
     offset: page * PAGE_SIZE,
   });
@@ -86,6 +89,15 @@ export function ExpensesView() {
           <option value="">Todas as categorias</option>
           {categories?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
+        <select
+          className="select select-sm"
+          aria-label="Filtrar por forma de pagamento"
+          value={paymentMethod}
+          onChange={(e) => { setPaymentMethod(e.target.value as ExpensePaymentMethod | ""); setPage(0); }}
+        >
+          <option value="">Todas as formas de pagamento</option>
+          {PAYMENT_METHODS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+        </select>
       </div>
 
       <div className="stats stats-vertical w-full bg-base-100 shadow-sm sm:stats-horizontal">
@@ -99,7 +111,7 @@ export function ExpensesView() {
           <div className="stat-figure text-secondary"><Hash className="size-7" /></div>
           <div className="stat-title">Lançamentos</div>
           <div className="stat-value text-2xl">{data ? data.total : "—"}</div>
-          <div className="stat-desc">{categoryId ? "Na categoria escolhida" : "No período"}</div>
+          <div className="stat-desc">{categoryId || paymentMethod ? "Nos filtros escolhidos" : "No período"}</div>
         </div>
         <div className="stat">
           <div className="stat-figure text-accent"><CalendarDays className="size-7" /></div>
@@ -141,6 +153,7 @@ export function ExpensesView() {
                         <p className="truncate font-medium">{expense.description || name}</p>
                         <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
                           <span className="badge badge-sm border-0" style={softStyle(color)}>{name}</span>
+                          <span className="badge badge-outline badge-sm">{paymentMethodLabel(expense.paymentMethod)}</span>
                           {!expense.paidAlone && <span className="badge badge-ghost badge-sm">dividido</span>}
                           {expense.receiptId && <span className="flex items-center gap-1 opacity-60"><Paperclip className="size-3" /> comprovante</span>}
                         </p>
