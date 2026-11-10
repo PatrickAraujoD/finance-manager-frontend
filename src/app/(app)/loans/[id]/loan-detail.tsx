@@ -13,6 +13,7 @@ import { useToast } from "@/components/toast";
 import { api, apiBlob, ApiError } from "@/lib/api";
 import type { Loan } from "@/lib/api-types";
 import { formatDate, formatMoney } from "@/lib/format";
+import { paymentMethodLabel } from "@/lib/payment-methods";
 import { isLoansKey, useLoan, useLoanPayments } from "@/lib/hooks";
 
 function EditForm({ loan, onDone }: { loan: Loan; onDone: () => void }) {
@@ -148,7 +149,13 @@ export function LoanDetail({ id }: { id: string }) {
                 <div><p className="text-xs opacity-60">Falta</p><p className="font-bold tabular-nums">{formatMoney(loan.remainingCents)}</p></div>
               </div>
               <progress className="progress progress-primary w-full" value={progress} max={100} aria-label="Quanto já foi pago" />
-              {loan.expenseId && <p className="text-xs opacity-60">Nasceu de um gasto registrado.</p>}
+              {loan.expenseId ? (
+                <p className="text-xs opacity-60">Nasceu de um gasto registrado.</p>
+              ) : (
+                loan.paymentMethod && loan.lentAt && (
+                  <p className="text-xs opacity-60">Emprestado em {formatDate(loan.lentAt)} · {paymentMethodLabel(loan.paymentMethod)}</p>
+                )
+              )}
             </>
           )}
         </div>

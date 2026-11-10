@@ -10,7 +10,7 @@ import { RecentExpenses } from "@/components/dashboard/recent-expenses";
 import { RecentLoans } from "@/components/dashboard/recent-loans";
 import { MonthPicker } from "@/components/month-picker";
 import { currentMonth } from "@/lib/format";
-import { useByCategory, useByDay, useEvolution, useIncomeVsSpent } from "@/lib/hooks";
+import { useByCategory, useCard, useEvolution, useIncomeVsSpent } from "@/lib/hooks";
 
 function Panel({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
@@ -28,12 +28,12 @@ export function Dashboard() {
   const [month, setMonth] = useState(currentMonth);
 
   const summary = useIncomeVsSpent(month);
-  const byDay = useByDay(month);
+  const card = useCard(month);
   const byCategory = useByCategory(month);
   const evolution = useEvolution(month);
 
   const firstName = session?.user.name?.split(" ")[0];
-  const failed = summary.error || byDay.error || byCategory.error || evolution.error;
+  const failed = summary.error || card.error || byCategory.error || evolution.error;
 
   return (
     <div className="space-y-5">
@@ -51,7 +51,7 @@ export function Dashboard() {
         </div>
       )}
 
-      <KpiCards month={month} summary={summary.data} byDay={byDay.data} loading={summary.isLoading} />
+      <KpiCards month={month} summary={summary.data} card={card.data} loading={summary.isLoading} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Panel title="Evolução mensal" className="lg:col-span-2">

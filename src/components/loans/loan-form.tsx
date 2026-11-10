@@ -4,7 +4,9 @@ import { Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useSWRConfig } from "swr";
+import { PaymentMethodPicker } from "@/components/expenses/payment-method-picker";
 import { useToast } from "@/components/toast";
+import type { ExpensePaymentMethod } from "@/lib/api-types";
 import { api } from "@/lib/api";
 import { formatDate, formatMoney, parseMoneyToCents, todayIso } from "@/lib/format";
 import { isLoansKey, useCategories, useExpenses } from "@/lib/hooks";
@@ -13,6 +15,12 @@ const MAX_CENTS = 1_000_000_000;
 const EXPENSE_CHOICES = 200;
 
 type Source = "expense" | "cash";
+
+function maxDate() {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
 
 export function LoanForm() {
   const router = useRouter();
@@ -27,6 +35,8 @@ export function LoanForm() {
   const [dueDate, setDueDate] = useState(todayIso());
   const [expenseId, setExpenseId] = useState("");
   const [amount, setAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<ExpensePaymentMethod | "">("");
+  const [lentAt, setLentAt] = useState(todayIso());
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +56,11 @@ export function LoanForm() {
         setError("Informe um valor maior que zero, como 150,00.");
         return;
       }
-      body = { ...base, amountCents: cents };
+      if (!paymentMethod) {
+        setError("Escolha de onde saiu o dinheiro: crédito, débito, Pix ou dinheiro.");
+        return;
+      }
+      body = { ...base, amountCents: cents, paymentMethod, lentAt };
     }
 
     setPending(true);
@@ -86,7 +100,7 @@ export function LoanForm() {
             <span>Gasto</span>
             <select required value={expenseId} onChange={(e) => setExpenseId(e.target.value)} className="select w-full" disabled={loadingExpenses}>
               <option value="" disabled>{loadingExpenses ? "Carregando gastos..." : "Gasto"}</option>
-              {expenses?.items.map((e) => (
+              {expenses?.items.filter((e) => !e.isCardPayment).map((e) => (
                 <option key={e.id} value={e.id}>
                   {formatDate(e.spentAt)} · {formatMoney(e.amountCents)} · {e.description || names.get(e.categoryId) || "Sem descrição"}
                 </option>
@@ -94,13 +108,27 @@ export function LoanForm() {
             </select>
           </label>
         ) : (
-          <label className="floating-label">
-            <span>Valor emprestado (R$)</span>
-            <input inputMode="decimal" required placeholder="Valor emprestado (R$)" value={amount} onChange={(e) => setAmount(e.target.value)} className="input w-full text-lg font-semibold" />
-          </label>
+          <>
+            <label className="floating-label">
+              <span>Valor emprestado (R$)</span>
+              <input inputMode="decimal" required placeholder="Valor emprestado (R$)" value={amount} onChange={(e) => setAmount(e.target.value)} className="input w-full text-lg font-semibold" />
+            </label>
+            <div className="space-y-2">
+              <PaymentMethodPicker value={paymentMethod} onChange={setPaymentMethod} label="De onde saiu o dinheiro" />
+              <p className="text-xs opacity-60">
+                {paymentMethod === "CREDIT"
+                  ? "No crédito o valor soma no cartão, como uma compra."
+                  : "Débito, Pix e dinheiro saem do salário do mês em que você emprestou."}
+              </p>
+            </div>
+            <label className="floating-label">
+              <span>Dia em que emprestou</span>
+              <input type="date" required min="2000-01-01" max={maxDate()} value={lentAt} onChange={(e) => setLentAt(e.target.value)} className="input w-full" />
+            </label>
+          </>
         )}
         {source === "expense" && (
-          <p className="text-xs opacity-60">O valor do empréstimo é o valor do gasto. Cada gasto gera no máximo um empréstimo.</p>
+          <p className="text-xs opacity-60">O valor, a forma de pagamento e a data vêm do gasto. Cada gasto gera no máximo um empréstimo, e pagamentos de fatura não entram na lista.</p>
         )}
 
         <label className="floating-label">

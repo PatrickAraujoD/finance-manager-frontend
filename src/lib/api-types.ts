@@ -28,7 +28,7 @@ export interface Income {
   amountCents: number;
 }
 
-export type ExpensePaymentMethod = "CREDIT" | "DEBIT" | "PIX";
+export type ExpensePaymentMethod = "CREDIT" | "DEBIT" | "PIX" | "CASH";
 
 export interface Expense {
   id: string;
@@ -37,6 +37,7 @@ export interface Expense {
   amountCents: number;
   paidAlone: boolean;
   paymentMethod: ExpensePaymentMethod;
+  isCardPayment: boolean;
   spentAt: string;
   description: string | null;
   createdAt: string;
@@ -65,12 +66,6 @@ export interface ReportByCategory {
   }[];
 }
 
-export interface ReportByDay {
-  month: string;
-  days: { date: string; totalCents: number }[];
-  topDay: { date: string; totalCents: number } | null;
-}
-
 export interface ReportMonthlyEvolution {
   from: string;
   to: string;
@@ -81,6 +76,8 @@ export interface ReportIncomeVsSpent {
   month: string;
   incomeCents: number | null;
   spentCents: number;
+  receivedCents: number;
+  creditSpentCents: number;
   remainingCents: number | null;
   percentSpent: number | null;
 }
@@ -94,6 +91,8 @@ export interface Loan {
   amountCents: number;
   dueDate: string;
   expenseId: string | null;
+  paymentMethod: ExpensePaymentMethod | null;
+  lentAt: string | null;
   paidCents: number;
   remainingCents: number;
   status: LoanStatus;
@@ -136,4 +135,12 @@ export interface LoansSummary {
   items: BorrowerSummary[];
   totals: LoanTotals;
   truncated: boolean;
+}
+
+export interface ReportCard {
+  month: string;
+  openingCents: number;
+  chargedCents: number;
+  paidCents: number;
+  balanceCents: number;
 }

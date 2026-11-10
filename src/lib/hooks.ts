@@ -14,7 +14,7 @@ import type {
   LoanStatus,
   ManagedUser,
   ReportByCategory,
-  ReportByDay,
+  ReportCard,
   ReportIncomeVsSpent,
   ReportMonthlyEvolution,
 } from "./api-types";
@@ -43,7 +43,7 @@ export const useIncome = (month: string) =>
 export const useByCategory = (month: string) =>
   useSWR<ReportByCategory>(["/reports/by-category", { month }], fetcher, opts);
 
-export const useByDay = (month: string) => useSWR<ReportByDay>(["/reports/by-day", { month }], fetcher, opts);
+export const useCard = (month: string) => useSWR<ReportCard>(["/reports/card", { month }], fetcher, opts);
 
 export const useIncomeVsSpent = (month: string) =>
   useSWR<ReportIncomeVsSpent>(["/reports/income-vs-spent", { month }], fetcher, opts);

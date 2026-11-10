@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Hash, Paperclip, Pencil, Plus, Receipt, Trash2, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronRight, Hash, Paperclip, Pencil, Plus, Receipt, Trash2, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
@@ -11,10 +11,10 @@ import { PageHeader } from "@/components/page-header";
 import { useToast } from "@/components/toast";
 import { api } from "@/lib/api";
 import type { Expense, ExpensePaymentMethod } from "@/lib/api-types";
-import { currentMonth, dayLabel, formatDate, formatDayShort, formatMoney, monthRange } from "@/lib/format";
+import { currentMonth, dayLabel, formatDate, formatMoney, monthRange } from "@/lib/format";
 import { PAYMENT_METHODS, paymentMethodLabel } from "@/lib/payment-methods";
 import { useCategoryColor } from "@/lib/use-category-color";
-import { useByCategory, useByDay, useCategories, useExpenses } from "@/lib/hooks";
+import { useByCategory, useCategories, useExpenses } from "@/lib/hooks";
 
 const PAGE_SIZE = 100;
 
@@ -45,7 +45,6 @@ export function ExpensesView() {
     offset: page * PAGE_SIZE,
   });
   const monthTotal = useByCategory(month).data;
-  const byDay = useByDay(month).data;
 
   const pages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
   const groups = data ? groupByDay(data.items) : [];
@@ -113,12 +112,6 @@ export function ExpensesView() {
           <div className="stat-value text-2xl">{data ? data.total : "—"}</div>
           <div className="stat-desc">{categoryId || paymentMethod ? "Nos filtros escolhidos" : "No período"}</div>
         </div>
-        <div className="stat">
-          <div className="stat-figure text-accent"><CalendarDays className="size-7" /></div>
-          <div className="stat-title">Dia de maior gasto</div>
-          <div className="stat-value text-2xl">{byDay?.topDay ? formatDayShort(byDay.topDay.date) : "—"}</div>
-          <div className="stat-desc">{byDay?.topDay ? formatMoney(byDay.topDay.totalCents) : "Sem gastos no mês"}</div>
-        </div>
       </div>
 
       {error && <div role="alert" className="alert alert-error alert-soft">Não foi possível carregar os gastos.</div>}
@@ -154,6 +147,7 @@ export function ExpensesView() {
                         <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
                           <span className="badge badge-sm border-0" style={softStyle(color)}>{name}</span>
                           <span className="badge badge-outline badge-sm">{paymentMethodLabel(expense.paymentMethod)}</span>
+                          {expense.isCardPayment && <span className="badge badge-info badge-soft badge-sm">fatura do cartão</span>}
                           {!expense.paidAlone && <span className="badge badge-ghost badge-sm">dividido</span>}
                           {expense.receiptId && <span className="flex items-center gap-1 opacity-60"><Paperclip className="size-3" /> comprovante</span>}
                         </p>

@@ -10,8 +10,9 @@ import { api, apiBlob } from "@/lib/api";
 import type { Expense, ExpensePaymentMethod, ReceiptUpload } from "@/lib/api-types";
 import { centsToInput, formatDate, formatMoney, parseMoneyToCents, todayIso } from "@/lib/format";
 import { useCategories } from "@/lib/hooks";
-import { PAYMENT_METHODS, paymentMethodLabel } from "@/lib/payment-methods";
+import { paymentMethodLabel } from "@/lib/payment-methods";
 import { useCategoryColor } from "@/lib/use-category-color";
+import { PaymentMethodPicker } from "./payment-method-picker";
 import { ReceiptUploader } from "./receipt-uploader";
 
 const MAX_CENTS = 1_000_000_000;
@@ -32,6 +33,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
   const [paidAlone, setPaidAlone] = useState(expense?.paidAlone ?? true);
   const [receipt, setReceipt] = useState<(ReceiptUpload & { fileName: string }) | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<ExpensePaymentMethod | "">(expense?.paymentMethod ?? "");
+  const [isCardPayment, setIsCardPayment] = useState(expense?.isCardPayment ?? false);
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
   const [spentAt, setSpentAt] = useState(expense?.spentAt ?? todayIso());
   const [description, setDescription] = useState(expense?.description ?? "");
@@ -41,6 +43,11 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
 
   const category = categories?.find((c) => c.id === categoryId);
   const previewCents = parseMoneyToCents(amount);
+
+  function selectMethod(method: ExpensePaymentMethod) {
+    setPaymentMethod(method);
+    if (method === "CREDIT") setIsCardPayment(false);
+  }
 
   function onReceiptChange(next: typeof receipt) {
     setReceipt(next);
@@ -73,6 +80,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
     const fields = {
       categoryId,
       paymentMethod,
+      isCardPayment,
       amountCents: cents,
       paidAlone,
       spentAt,
@@ -87,7 +95,10 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
         if (fields.categoryId !== expense.categoryId) changes.categoryId = fields.categoryId;
         if (fields.amountCents !== expense.amountCents) changes.amountCents = fields.amountCents;
         if (fields.paidAlone !== expense.paidAlone) changes.paidAlone = fields.paidAlone;
-        if (fields.paymentMethod !== expense.paymentMethod) changes.paymentMethod = fields.paymentMethod;
+        if (fields.paymentMethod !== expense.paymentMethod || fields.isCardPayment !== expense.isCardPayment) {
+          changes.paymentMethod = fields.paymentMethod;
+          changes.isCardPayment = fields.isCardPayment;
+        }
         if (fields.spentAt !== expense.spentAt) changes.spentAt = fields.spentAt;
         if (fields.description !== (expense.description ?? "")) changes.description = fields.description;
         if (Object.keys(changes).length > 0) {
@@ -157,23 +168,32 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
           />
         </label>
 
-        <fieldset className="space-y-2 pb-1">
-          <legend className="mb-1 text-xs opacity-60">Forma de pagamento</legend>
-          <div role="radiogroup" aria-label="Forma de pagamento" className="grid grid-cols-3 gap-3">
-            {PAYMENT_METHODS.map((m) => (
-              <button
-                key={m.value}
-                type="button"
-                role="radio"
-                aria-checked={paymentMethod === m.value}
-                className={`btn ${paymentMethod === m.value ? "btn-primary" : ""}`}
-                onClick={() => setPaymentMethod(m.value)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        <div className="space-y-2">
+          <PaymentMethodPicker value={paymentMethod} onChange={selectMethod} />
+          <p className="text-xs opacity-60">
+            {paymentMethod === "CREDIT"
+              ? "No crédito o gasto não sai do salário: ele soma no valor do cartão."
+              : "Débito, Pix e dinheiro saem do salário do mês."}
+          </p>
+        </div>
+
+        <label className="label cursor-pointer justify-start gap-3">
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={isCardPayment}
+            disabled={paymentMethod === "CREDIT"}
+            onChange={(e) => setIsCardPayment(e.target.checked)}
+          />
+          <span>
+            Pagamento da fatura do cartão
+            <span className="block text-xs opacity-60">
+              {paymentMethod === "CREDIT"
+                ? "Não dá para pagar o cartão com o próprio cartão."
+                : "Sai do salário e abate o valor do cartão de crédito."}
+            </span>
+          </span>
+        </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="floating-label">
@@ -236,7 +256,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
               <span className="grid size-9 place-items-center rounded-xl bg-base-200"><CreditCard className="size-4" /></span>
               <div>
                 <dt className="text-xs opacity-60">Forma de pagamento</dt>
-                <dd className="font-medium">{paymentMethod ? paymentMethodLabel(paymentMethod) : "Escolha uma forma"}</dd>
+                <dd className="font-medium">{paymentMethod ? `${paymentMethodLabel(paymentMethod)}${isCardPayment ? " · fatura do cartão" : ""}` : "Escolha uma forma"}</dd>
               </div>
             </div>
             <div className="flex items-center gap-3">

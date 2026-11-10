@@ -1,11 +1,11 @@
-import { CalendarDays, Gauge, TrendingUp } from "lucide-react";
-import type { ReportByDay, ReportIncomeVsSpent } from "@/lib/api-types";
-import { currentMonth, daysInMonth, formatDayShort, formatMoney } from "@/lib/format";
+import { CreditCard, Gauge, TrendingUp } from "lucide-react";
+import type { ReportCard, ReportIncomeVsSpent } from "@/lib/api-types";
+import { currentMonth, daysInMonth, formatMoney } from "@/lib/format";
 
 interface Props {
   month: string;
   summary?: ReportIncomeVsSpent;
-  byDay?: ReportByDay;
+  card?: ReportCard;
   loading: boolean;
 }
 
@@ -13,7 +13,7 @@ function Skeleton() {
   return <div className="skeleton h-24 w-full" />;
 }
 
-export function KpiCards({ month, summary, byDay, loading }: Props) {
+export function KpiCards({ month, summary, card, loading }: Props) {
   if (loading || !summary) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -66,25 +66,27 @@ export function KpiCards({ month, summary, byDay, loading }: Props) {
           ) : (
             <p className="text-sm opacity-70">Sem salário cadastrado</p>
           )}
+          {summary.receivedCents > 0 && (
+            <p className="text-sm text-success">+ {formatMoney(summary.receivedCents)} recebidos de empréstimos</p>
+          )}
         </div>
       </div>
 
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body gap-1 p-5">
           <p className="flex items-center justify-between text-sm opacity-70">
-            Dia de maior gasto <CalendarDays className="size-4" />
+            Cartão de crédito <CreditCard className="size-4" />
           </p>
-          {byDay?.topDay ? (
-            <>
-              <p className="text-2xl font-extrabold tracking-tight">{formatDayShort(byDay.topDay.date)}</p>
-              <p className="text-sm text-error">{formatMoney(byDay.topDay.totalCents)} em um dia</p>
-            </>
-          ) : (
-            <>
-              <p className="text-2xl font-extrabold tracking-tight">—</p>
-              <p className="text-sm opacity-70">Nenhum gasto no mês</p>
-            </>
-          )}
+          <p className={`text-2xl font-extrabold tracking-tight ${card && card.balanceCents < 0 ? "text-success" : ""}`}>
+            {card ? formatMoney(card.balanceCents) : "—"}
+          </p>
+          <p className="text-sm opacity-70">
+            {!card
+              ? "Carregando o cartão"
+              : card.balanceCents < 0
+                ? "Você pagou a mais que o devido"
+                : `${formatMoney(card.chargedCents)} em compras, ${formatMoney(card.paidCents)} pagos no mês`}
+          </p>
         </div>
       </div>
 
