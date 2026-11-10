@@ -1,4 +1,4 @@
-import { CreditCard, Gauge, TrendingUp } from "lucide-react";
+import { CreditCard, Gauge, TrendingUp, Wallet } from "lucide-react";
 import type { ReportCard, ReportIncomeVsSpent } from "@/lib/api-types";
 import { currentMonth, daysInMonth, formatMoney } from "@/lib/format";
 
@@ -16,7 +16,7 @@ function Skeleton() {
 export function KpiCards({ month, summary, card, loading }: Props) {
   if (loading || !summary) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="card bg-base-100 p-5 shadow-sm">
             <Skeleton />
@@ -35,21 +35,23 @@ export function KpiCards({ month, summary, card, loading }: Props) {
   const overspent = hasIncome && (summary.remainingCents ?? 0) < 0;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <div className="card bg-linear-to-br from-primary to-secondary text-primary-content shadow-lg">
-        <div className="card-body gap-1 p-5">
-          <p className="text-sm opacity-90">Saldo do mês</p>
-          <p className="text-3xl font-extrabold tracking-tight">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="card bg-base-100 shadow-sm">
+        <div className="card-body justify-start gap-1 p-5">
+          <p className="flex items-center justify-between text-sm opacity-70">
+            Saldo do mês <Wallet className="size-4" />
+          </p>
+          <p className={`text-2xl font-extrabold tracking-tight ${overspent ? "text-error" : ""}`}>
             {hasIncome ? formatMoney(summary.remainingCents!) : "—"}
           </p>
-          <p className="text-sm opacity-90">
+          <p className="text-sm opacity-70">
             {hasIncome ? `de ${formatMoney(summary.incomeCents!)} de salário` : "Informe o salário para ver o saldo"}
           </p>
         </div>
       </div>
 
       <div className="card bg-base-100 shadow-sm">
-        <div className="card-body gap-1 p-5">
+        <div className="card-body justify-start gap-1 p-5">
           <p className="flex items-center justify-between text-sm opacity-70">
             Gasto no mês <TrendingUp className="size-4" />
           </p>
@@ -73,7 +75,7 @@ export function KpiCards({ month, summary, card, loading }: Props) {
       </div>
 
       <div className="card bg-base-100 shadow-sm">
-        <div className="card-body gap-1 p-5">
+        <div className="card-body justify-start gap-1 p-5">
           <p className="flex items-center justify-between text-sm opacity-70">
             Cartão de crédito <CreditCard className="size-4" />
           </p>
@@ -91,7 +93,7 @@ export function KpiCards({ month, summary, card, loading }: Props) {
       </div>
 
       <div className="card bg-base-100 shadow-sm">
-        <div className="card-body gap-1 p-5">
+        <div className="card-body justify-start gap-1 p-5">
           <p className="flex items-center justify-between text-sm opacity-70">
             Média por dia <Gauge className="size-4" />
           </p>
