@@ -5,6 +5,7 @@ import { ApiError, fetcher } from "./api";
 import type {
   Category,
   ExpensePage,
+  ExpensePaymentMethod,
   Income,
   ManagedUser,
   ReportByCategory,
@@ -53,6 +54,7 @@ export interface ExpenseFilters {
   from?: string;
   to?: string;
   categoryId?: string;
+  paymentMethod?: ExpensePaymentMethod;
   limit?: number;
   offset?: number;
 }

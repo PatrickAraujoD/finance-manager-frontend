@@ -1,15 +1,16 @@
 "use client";
 
-import { CalendarDays, Download, Loader2, Paperclip, Save, Users } from "lucide-react";
+import { CalendarDays, CreditCard, Download, Loader2, Paperclip, Save, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useSWRConfig } from "swr";
 import { softStyle } from "@/components/dashboard/palette";
 import { useToast } from "@/components/toast";
 import { api, apiBlob } from "@/lib/api";
-import type { Expense, ReceiptUpload } from "@/lib/api-types";
+import type { Expense, ExpensePaymentMethod, ReceiptUpload } from "@/lib/api-types";
 import { centsToInput, formatDate, formatMoney, parseMoneyToCents, todayIso } from "@/lib/format";
 import { useCategories } from "@/lib/hooks";
+import { PAYMENT_METHODS, paymentMethodLabel } from "@/lib/payment-methods";
 import { useCategoryColor } from "@/lib/use-category-color";
 import { ReceiptUploader } from "./receipt-uploader";
 
@@ -30,6 +31,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
 
   const [paidAlone, setPaidAlone] = useState(expense?.paidAlone ?? true);
   const [receipt, setReceipt] = useState<(ReceiptUpload & { fileName: string }) | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<ExpensePaymentMethod | "">(expense?.paymentMethod ?? "");
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? "");
   const [spentAt, setSpentAt] = useState(expense?.spentAt ?? todayIso());
   const [description, setDescription] = useState(expense?.description ?? "");
@@ -64,8 +66,13 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
       setError("Informe um valor maior que zero, como 59,90.");
       return;
     }
+    if (!paymentMethod) {
+      setError("Escolha a forma de pagamento: crédito, débito ou Pix.");
+      return;
+    }
     const fields = {
       categoryId,
+      paymentMethod,
       amountCents: cents,
       paidAlone,
       spentAt,
@@ -80,6 +87,7 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
         if (fields.categoryId !== expense.categoryId) changes.categoryId = fields.categoryId;
         if (fields.amountCents !== expense.amountCents) changes.amountCents = fields.amountCents;
         if (fields.paidAlone !== expense.paidAlone) changes.paidAlone = fields.paidAlone;
+        if (fields.paymentMethod !== expense.paymentMethod) changes.paymentMethod = fields.paymentMethod;
         if (fields.spentAt !== expense.spentAt) changes.spentAt = fields.spentAt;
         if (fields.description !== (expense.description ?? "")) changes.description = fields.description;
         if (Object.keys(changes).length > 0) {
@@ -149,6 +157,24 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
           />
         </label>
 
+        <fieldset className="space-y-1.5">
+          <legend className="text-xs opacity-60">Forma de pagamento</legend>
+          <div role="radiogroup" aria-label="Forma de pagamento" className="join w-full">
+            {PAYMENT_METHODS.map((m) => (
+              <button
+                key={m.value}
+                type="button"
+                role="radio"
+                aria-checked={paymentMethod === m.value}
+                className={`btn join-item flex-1 ${paymentMethod === m.value ? "btn-primary" : ""}`}
+                onClick={() => setPaymentMethod(m.value)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="floating-label">
             <span>Categoria</span>
@@ -204,6 +230,13 @@ export function ExpenseForm({ expense }: { expense?: Expense }) {
               <div>
                 <dt className="text-xs opacity-60">Data</dt>
                 <dd className="font-medium">{spentAt ? formatDate(spentAt) : "—"}</dd>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="grid size-9 place-items-center rounded-xl bg-base-200"><CreditCard className="size-4" /></span>
+              <div>
+                <dt className="text-xs opacity-60">Forma de pagamento</dt>
+                <dd className="font-medium">{paymentMethod ? paymentMethodLabel(paymentMethod) : "Escolha uma forma"}</dd>
               </div>
             </div>
             <div className="flex items-center gap-3">
